@@ -1,0 +1,30 @@
+{
+  "name": "rebyte",
+  "private": true,
+  "version": "1.0.0",
+  "description": "ReByte: inventario pequeño para vender equipos usados (laptops, desktops, monitores, tablets y accesorios).",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c auto \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "API_PORT=${API_PORT:-3005} node --watch-path=server --watch-path=shared server/index.js",
+    "dev:web": "vite",
+    "build": "vite build",
+    "start": "node server/index.js",
+    "preview": "vite preview",
+    "test": "DB_FILE=:memory: node --no-warnings --test test/*.test.js"
+  },
+  "engines": {
+    "node": "24.x"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "lucide-react": "^1.58.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.2",
+    "concurrently": "^10.0.6",
+    "vite": "^8.3.4"
+  }
+}
