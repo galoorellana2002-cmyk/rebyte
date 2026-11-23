@@ -1,6 +1,5 @@
 import express from 'express';
 import { location } from './db.js';
-import { ensureSeeded, resetDemo } from './seed.js';
 import {
   createEquipment,
   createSale,
@@ -13,8 +12,6 @@ import {
   updateEquipment,
   voidSale,
 } from './store.js';
-
-if (ensureSeeded()) console.log('Datos de demostración creados.');
 
 const app = express();
 app.disable('x-powered-by');
@@ -35,11 +32,6 @@ app.post('/api/sales', (req, res) => res.status(201).json(createSale(req.body)))
 app.post('/api/sales/:id/void', (req, res) => res.json(voidSale(req.params.id)));
 
 app.get('/api/summary', (req, res) => res.json(summary()));
-
-app.post('/api/demo/reset', (req, res) => {
-  resetDemo();
-  res.json({ ok: true });
-});
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'Ruta no encontrada.' }));
 

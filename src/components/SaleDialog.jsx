@@ -1,6 +1,6 @@
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { PAYMENTS, round2, saleTotals, specsLine } from '../../shared/catalog.js';
+import { PAYMENTS, round2, SALE_PAYMENTS, saleTotals, specsLine } from '../../shared/catalog.js';
 import { api, money } from '../lib.js';
 import { Field, Modal, Segmented } from './ui.jsx';
 
@@ -101,7 +101,7 @@ export default function SaleDialog({ items: initial, onClose, onSold }) {
           <input value={form.phone} onChange={set('phone')} inputMode="tel" maxLength={20} />
         </Field>
         <Field label="Forma de pago" error={errors.payment} span={2}>
-          <Segmented name="Forma de pago" value={form.payment} onChange={set('payment')} options={Object.entries(PAYMENTS)} />
+          <Segmented name="Forma de pago" value={form.payment} onChange={set('payment')} options={SALE_PAYMENTS.map((k) => [k, PAYMENTS[k]])} />
         </Field>
         <Field label="Descuento (USD)" error={errors.discount}>
           <input value={form.discount} onChange={set('discount')} inputMode="decimal" placeholder="0.00" aria-invalid={Boolean(errors.discount)} />

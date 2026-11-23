@@ -13,7 +13,7 @@ import { api, money, percent } from '../lib.js';
 import { Field, Modal, Segmented } from './ui.jsx';
 
 const EMPTY = {
-  type: 'laptop', brand: '', model: '', cpu: '', ram_gb: '', storage_gb: '', storage_type: 'SSD', screen_in: '',
+  type: 'laptop', code: '', brand: '', model: '', cpu: '', ram_gb: '', storage_gb: '', storage_type: 'SSD', screen_in: '',
   battery_pct: '', serial: '', grade: 'B', status: 'disponible', cost: '', price: '', warranty_days: '30',
   received_at: '', source: '', notes: '',
 };
@@ -74,7 +74,7 @@ export default function EquipmentDialog({ equipment, onClose, onSaved }) {
     <Modal
       wide
       title={editing ? `Editar ${equipment.code}` : 'Ingresar equipo'}
-      subtitle={editing ? `${equipment.brand} ${equipment.model}` : 'El código se asigna solo según el tipo.'}
+      subtitle={editing ? `${equipment.brand} ${equipment.model}` : undefined}
       onClose={onClose}
       onSubmit={submit}
       footer={
@@ -91,7 +91,10 @@ export default function EquipmentDialog({ equipment, onClose, onSaved }) {
         <Field label="Tipo" error={errors.type} span={4}>
           <Segmented name="Tipo" value={form.type} onChange={set('type')} options={Object.entries(TYPES).map(([k, t]) => [k, t.label])} />
         </Field>
-        <Field label="Marca" error={errors.brand} span={2}>{input('brand', { placeholder: 'Lenovo', 'data-autofocus': !editing || undefined })}</Field>
+        <Field label="Código" error={errors.code} hint={editing ? undefined : 'Vacío: se asigna solo'}>
+          {input('code', { placeholder: TYPES[form.type]?.prefix ? `${TYPES[form.type].prefix}…` : '', autoCapitalize: 'characters' })}
+        </Field>
+        <Field label="Marca" error={errors.brand}>{input('brand', { placeholder: 'Lenovo', 'data-autofocus': !editing || undefined })}</Field>
         <Field label="Modelo" error={errors.model} span={2}>{input('model', { placeholder: 'ThinkPad T480' })}</Field>
 
         {has('cpu') && <Field label="Procesador" error={errors.cpu} span={2}>{input('cpu', { placeholder: 'Core i5-8350U' })}</Field>}

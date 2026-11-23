@@ -56,7 +56,7 @@ const SCHEMA = `
 
 function resolveLocation() {
   if (process.env.DB_FILE) return process.env.DB_FILE;
-  // En Vercel el disco es de solo lectura: la demo vive en memoria y se reinicia sola.
+  // En Vercel el disco es de solo lectura: ahí la base vive en memoria y se pierde al reiniciarse.
   if (process.env.VERCEL) return ':memory:';
   const dir = path.resolve('data');
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });

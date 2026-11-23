@@ -1,9 +1,9 @@
 // Reglas del negocio que comparten el servidor y la interfaz.
 
 export const TYPES = {
-  laptop: { label: 'Laptop', prefix: 'LAP', fields: ['cpu', 'ram_gb', 'storage', 'screen_in', 'battery_pct'] },
-  desktop: { label: 'Desktop', prefix: 'DES', fields: ['cpu', 'ram_gb', 'storage'] },
-  monitor: { label: 'Monitor', prefix: 'MON', fields: ['screen_in'] },
+  laptop: { label: 'Laptop', prefix: 'LPT', fields: ['cpu', 'ram_gb', 'storage', 'screen_in', 'battery_pct'] },
+  desktop: { label: 'Desktop', prefix: 'CPU', fields: ['cpu', 'ram_gb', 'storage'] },
+  monitor: { label: 'Monitor', prefix: 'MNT', fields: ['screen_in'] },
   tablet: { label: 'Tablet', prefix: 'TAB', fields: ['ram_gb', 'storage', 'screen_in', 'battery_pct'] },
   accesorio: { label: 'Accesorio', prefix: 'ACC', fields: [] },
 };
@@ -31,7 +31,10 @@ export const PAYMENTS = {
   efectivo: 'Efectivo',
   transferencia: 'Transferencia',
   tarjeta: 'Tarjeta',
+  // Solo para ventas importadas del Excel, que no dicen cómo se pagó.
+  no_registrado: 'No registrado',
 };
+export const SALE_PAYMENTS = ['efectivo', 'transferencia', 'tarjeta'];
 
 /** A partir de estos días en bodega un equipo se considera estancado. */
 export const STALE_DAYS = 60;
@@ -107,6 +110,10 @@ export function validateEquipment(input = {}, now = today()) {
     grade: text(input.grade),
     status: text(input.status) || 'disponible',
   };
+
+  // Código de venta (AIO24, LPT1…). Vacío: el sistema asigna el siguiente del tipo.
+  v.code = text(input.code).toUpperCase();
+  if (v.code && !/^[A-Z0-9][A-Z0-9-]{0,19}$/.test(v.code)) errors.code = 'Solo letras, números y guiones (máx. 20).';
 
   if (!v.brand) errors.brand = 'Escribe la marca.';
   else if (v.brand.length > 40) errors.brand = 'Máximo 40 caracteres.';

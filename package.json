@@ -11,12 +11,14 @@
     "build": "vite build",
     "start": "node server/index.js",
     "preview": "vite preview",
+    "import": "node server/import-cli.js",
     "test": "DB_FILE=:memory: node --no-warnings --test test/*.test.js"
   },
   "engines": {
     "node": "24.x"
   },
   "dependencies": {
+    "exceljs": "^4.4.0",
     "express": "^5.3.0",
     "lucide-react": "^1.58.0",
     "react": "^19.3.1",

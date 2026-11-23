@@ -48,11 +48,21 @@ function mustGetEquipment(id) {
   return row;
 }
 
+/** Siguiente código del tipo con el estilo del Excel: LPT1, LPT2… */
 function nextCode(type) {
   const prefix = TYPES[type].prefix;
-  const row = get("SELECT code FROM equipment WHERE code LIKE ? ORDER BY code DESC LIMIT 1", `${prefix}-%`);
-  const n = row ? Number(row.code.slice(prefix.length + 1)) + 1 : 1;
-  return `${prefix}-${String(n).padStart(4, '0')}`;
+  const re = new RegExp(`^${prefix}-?(\\d+)$`);
+  const max = all('SELECT code FROM equipment WHERE code LIKE ?', `${prefix}%`)
+    .reduce((m, r) => Math.max(m, Number(re.exec(r.code)?.[1] ?? 0)), 0);
+  let n = max + 1;
+  while (get('SELECT 1 FROM equipment WHERE code = ?', `${prefix}${n}`)) n++;
+  return `${prefix}${n}`;
+}
+
+function assertFreeCode(code, exceptId = 0) {
+  if (get('SELECT 1 FROM equipment WHERE code = ? AND id <> ?', code, exceptId)) {
+    throw new HttpError(400, 'Revisa los campos marcados.', { code: `El código ${code} ya existe.` });
+  }
 }
 
 function validated(input, now) {
@@ -65,7 +75,8 @@ export function createEquipment(input, { date = today() } = {}) {
   const v = validated(input, date);
   const stamp = new Date().toISOString();
   return tx(() => {
-    const code = nextCode(v.type);
+    if (v.code) assertFreeCode(v.code);
+    const code = v.code || nextCode(v.type);
     const { lastInsertRowid } = run(
       `INSERT INTO equipment (code, ${COLUMNS.join(', ')}, created_at, updated_at)
        VALUES (?, ${COLUMNS.map(() => '?').join(', ')}, ?, ?)`,
@@ -81,9 +92,11 @@ export function updateEquipment(id, input) {
     throw new HttpError(409, `${current.code} ya se vendió. Anula la venta si necesitas modificarlo.`);
   }
   const v = validated(input, today());
+  const code = v.code || current.code;
+  assertFreeCode(code, current.id);
   run(
-    `UPDATE equipment SET ${COLUMNS.map((c) => `${c} = ?`).join(', ')}, updated_at = ? WHERE id = ?`,
-    ...params(v), new Date().toISOString(), current.id,
+    `UPDATE equipment SET code = ?, ${COLUMNS.map((c) => `${c} = ?`).join(', ')}, updated_at = ? WHERE id = ?`,
+    code, ...params(v), new Date().toISOString(), current.id,
   );
   return getEquipment(current.id);
 }
@@ -188,6 +201,15 @@ export function voidSale(id) {
     }
   });
   return getSale(sale.id);
+}
+
+/** Borra todo (solo para pruebas). */
+export function clearAll() {
+  tx(() => {
+    run('DELETE FROM sale_items');
+    run('DELETE FROM sales');
+    run('DELETE FROM equipment');
+  });
 }
 
 /* ---------- Resumen ---------- */

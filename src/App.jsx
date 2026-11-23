@@ -1,4 +1,4 @@
-import { LayoutDashboard, Monitor, Package, Receipt, RotateCcw } from 'lucide-react';
+import { LayoutDashboard, Monitor, Package, Receipt } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import EquipmentDialog from './components/EquipmentDialog.jsx';
 import ReceiptDialog from './components/ReceiptDialog.jsx';
@@ -105,11 +105,6 @@ export default function App() {
         <main className="page">
           <div className="page-head">
             <h1>{title}</h1>
-            {tab === 'resumen' && (
-              <button type="button" className="btn ghost small" onClick={() => setDialog({ kind: 'reset' })}>
-                <RotateCcw size={14} /> Reiniciar demo
-              </button>
-            )}
           </div>
 
           {loadError && (
@@ -180,16 +175,6 @@ export default function App() {
         >
           {dialog.sale.items.length === 1 ? 'El equipo vuelve' : `Los ${dialog.sale.items.length} equipos vuelven`} al inventario como
           «Disponible» y la venta queda en el historial marcada como anulada.
-        </Confirm>
-      )}
-      {dialog?.kind === 'reset' && (
-        <Confirm
-          title="¿Reiniciar los datos de demostración?"
-          action="Reiniciar"
-          onClose={close}
-          onConfirm={() => confirmAction(() => api('/demo/reset', { method: 'POST' }), 'Datos de demostración restaurados.')}
-        >
-          Se borran todos los equipos y ventas y se cargan los de ejemplo.
         </Confirm>
       )}
 
